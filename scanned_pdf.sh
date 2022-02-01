@@ -12,14 +12,17 @@ Usage: $0 file.pdf
 OPTIONS:
    -h     Show this message
    -o     Output File (default: document_flat.pdf)
+   -c     Color
 EOF
 }
 
 OUTPUT_FILE="document_flat.pdf"
+COLORSPACE="-colorspace gray"
 
 while getopts "o:h?" OPTION; do
   case $OPTION in
     o) OUTPUT_FILE=$OPTARG;;
+    c) COLORSPACE=""
     h|?) usage; exit 1 ;;
   esac
 done
@@ -34,7 +37,7 @@ if [[ -z $1 ]]; then
 fi
 
 echo "Converting to image (2-3 seconds per page)"
-convert -density 150 "${INPUT_FILE}" -colorspace gray -linear-stretch 3.5%x10% -blur 0x0.5 -attenuate 0.25 +noise Gaussian  -rotate 1.0 "${TMP_FILE}"
+convert -density 300 "${INPUT_FILE}" ${COLORSPACE} -linear-stretch 3.5%x10% -blur 0x0.5 -attenuate 0.25 +noise Gaussian  -rotate 0.3 "${TMP_FILE}"
 
 echo "Generating ${OUTPUT_FILE}"
 gs -dSAFER -dBATCH -dNOPAUSE -dNOCACHE -sDEVICE=pdfwrite -sColorConversionStrategy=LeaveColorUnchanged -dAutoFilterColorImages=true -dAutoFilterGrayImages=true -dDownsampleMonoImages=true -dDownsampleGrayImages=true -dDownsampleColorImages=true -sOutputFile="${OUTPUT_FILE}" "${TMP_FILE}"
